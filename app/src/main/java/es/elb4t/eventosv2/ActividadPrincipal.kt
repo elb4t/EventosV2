@@ -73,10 +73,18 @@ class ActividadPrincipal : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val extras = intent.extras
-        if (intent.hasExtra("body")) {
-            mostrarDialogo(this, extras!!.getString("body"))
-            extras!!.remove("body")
+        var extras = intent.extras
+        if (extras != null && extras.keySet().size > 4) {
+            var evento = ""
+            evento = "Evento: " + extras.getString("evento") + "\n"
+            evento = evento + "Día: " + extras.getString("dia") + "\n"
+            evento = evento + "Ciudad: " + extras.getString("ciudad") + "\n"
+            evento = evento + "Comentario: " + extras.getString("comentario")
+            mostrarDialogo(applicationContext, evento)
+            for (key in extras.keySet()) {
+                intent.removeExtra(key)
+            }
+            extras.clear()
         }
     }
 }
