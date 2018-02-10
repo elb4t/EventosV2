@@ -2,6 +2,7 @@ package es.elb4t.eventosv2.firebase
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import es.elb4t.eventosv2.EventosAplicacion.Companion.mostrarDialogo
 
 /**
  * Created by eloy on 9/2/18.
@@ -17,10 +18,10 @@ class EventosFCMService : FirebaseMessagingService() {
                     remoteMessage.data["ciudad"] + "\n"
             evento = (evento + "Comentario: "
                     + remoteMessage.data["comentario"])
-            //mostrarDialogo(getApplicationContext(), evento)
+            mostrarDialogo(applicationContext, evento)
         } else {
             if (remoteMessage.notification != null) {
-                //mostrarDialogo(getApplicationContext(), remoteMessage.getNotification().getBody())
+                mostrarDialogo(applicationContext, remoteMessage.notification!!.body!!)
             }
         }
     }

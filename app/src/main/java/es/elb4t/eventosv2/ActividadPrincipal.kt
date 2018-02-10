@@ -11,6 +11,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.database.DatabaseReference
 import es.elb4t.eventosv2.EventosAplicacion.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
 import es.elb4t.eventosv2.EventosAplicacion.Companion.itemsReference
+import es.elb4t.eventosv2.EventosAplicacion.Companion.mostrarDialogo
 import es.elb4t.eventosv2.adapter.EventosRecyclerAdapter
 import es.elb4t.eventosv2.adapter.EventosRecyclerAdapter.EventoViewHolder
 import es.elb4t.eventosv2.model.EventoItem
@@ -20,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_actividad_principal.*
 class ActividadPrincipal : AppCompatActivity() {
     private lateinit var databaseReference: DatabaseReference
     private var adapter: FirebaseRecyclerAdapter<EventoItem, EventoViewHolder>? = null
-
+    private var current: ActividadPrincipal? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,10 +59,24 @@ class ActividadPrincipal : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         adapter!!.startListening()
+        current = this
     }
 
     override fun onStop() {
         super.onStop()
         adapter!!.stopListening()
+    }
+
+    fun getCurrentContext(): ActividadPrincipal {
+        return current!!
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val extras = intent.extras
+        if (intent.hasExtra("body")) {
+            mostrarDialogo(this, extras!!.getString("body"))
+            extras!!.remove("body")
+        }
     }
 }

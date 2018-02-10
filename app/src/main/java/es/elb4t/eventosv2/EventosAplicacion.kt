@@ -2,8 +2,10 @@ package es.elb4t.eventosv2
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import es.elb4t.eventosv2.utils.Dialogo
 
 
 /**
@@ -19,6 +21,12 @@ class EventosAplicacion : Application() {
             private set
         var appContext: Context? = null
             private set
+        fun mostrarDialogo(context: Context, mensaje: String) {
+            val intent = Intent(context, Dialogo::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.putExtra("mensaje", mensaje)
+            context.startActivity(intent)
+        }
     }
 
     override fun onCreate() {
