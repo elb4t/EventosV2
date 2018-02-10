@@ -2,13 +2,14 @@ package es.elb4t.eventosv2.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.google.firebase.database.DatabaseReference
+import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.squareup.picasso.Picasso
 import es.elb4t.eventosv2.R
 import es.elb4t.eventosv2.model.EventoItem
@@ -16,17 +17,10 @@ import es.elb4t.eventosv2.model.EventoItem
 /**
  * Created by eloy on 10/2/18.
  */
-class EventosRecyclerAdapter(modelLayout: Int, ref: DatabaseReference, val mContext: Context) :
-        FirebaseRecyclerAdapter<EventoItem, EventosRecyclerAdapter.EventoViewHolder>(
-                EventoItem::class.java, modelLayout, EventosRecyclerAdapter.EventoViewHolder::class.java, ref) {
+class EventosRecyclerAdapter(private val mContext: Context, options: FirebaseRecyclerOptions<EventoItem>) :
+        FirebaseRecyclerAdapter<EventoItem, EventosRecyclerAdapter.EventoViewHolder>(options) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventoViewHolder {
-        val view = LayoutInflater.from(parent.getContext())
-                .inflate(mModelLayout, parent, false) as ViewGroup
-        return EventoViewHolder(view)
-    }
-
-    override fun populateViewHolder(holder: EventoViewHolder, item: EventoItem, position: Int) {
+    override fun onBindViewHolder(holder: EventoViewHolder, position: Int, item: EventoItem) {
         val txtEvento = item.evento
         val txtCiudad = item.ciudad
         val txtFecha = item.fecha
@@ -42,7 +36,14 @@ class EventosRecyclerAdapter(modelLayout: Int, ref: DatabaseReference, val mCont
                 .centerCrop()
                 .onlyScaleDown()
                 .into(holder.imagen)
+        Log.e("ADAPTER------","----------------------------")
+    }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventoViewHolder {
+        Log.e("CRATE------","VIEW----------------------------")
+        val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.evento, parent, false) as ViewGroup
+        return EventoViewHolder(view)
     }
 
     class EventoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

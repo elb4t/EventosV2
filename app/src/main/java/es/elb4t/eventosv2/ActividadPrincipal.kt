@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
 import com.firebase.ui.database.FirebaseRecyclerAdapter
+import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.database.DatabaseReference
@@ -30,9 +31,12 @@ class ActividadPrincipal : AppCompatActivity() {
             finish()
         }
 
-        val app: EventosAplicacion = applicationContext as EventosAplicacion
         databaseReference = itemsReference!!
-        adapter = EventosRecyclerAdapter(R.layout.evento, databaseReference, this)
+
+        val options = FirebaseRecyclerOptions.Builder<EventoItem>()
+                .setQuery(databaseReference, EventoItem::class.java)
+                .build()
+        adapter = EventosRecyclerAdapter(this, options)
         reciclerViewEventos.layoutManager = LinearLayoutManager(this)
         reciclerViewEventos.adapter = adapter
     }
@@ -49,5 +53,15 @@ class ActividadPrincipal : AppCompatActivity() {
             return false
         }
         return true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter!!.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter!!.stopListening()
     }
 }
