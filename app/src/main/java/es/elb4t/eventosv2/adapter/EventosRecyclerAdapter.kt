@@ -2,7 +2,6 @@ package es.elb4t.eventosv2.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,11 +35,9 @@ class EventosRecyclerAdapter(private val mContext: Context, options: FirebaseRec
                 .centerCrop()
                 .onlyScaleDown()
                 .into(holder.imagen)
-        Log.e("ADAPTER------","----------------------------")
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventoViewHolder {
-        Log.e("CRATE------","VIEW----------------------------")
         val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.evento, parent, false) as ViewGroup
         return EventoViewHolder(view)
