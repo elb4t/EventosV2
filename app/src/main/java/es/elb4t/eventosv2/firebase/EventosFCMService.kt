@@ -2,7 +2,7 @@ package es.elb4t.eventosv2.firebase
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import es.elb4t.eventosv2.EventosAplicacion.Companion.mostrarDialogo
+import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 
 /**
  * Created by eloy on 9/2/18.

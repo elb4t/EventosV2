@@ -14,7 +14,7 @@ import es.elb4t.eventosv2.utils.RequestVolley
  * Created by eloy on 10/2/18.
  */
 
-class EventosAplicacion : Application() {
+class Comun : Application() {
     private val ITEMS_CHILD_NAME = "eventos"
 
     companion object {
@@ -46,8 +46,8 @@ class EventosAplicacion : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.e("EventosAplicacion", "--------FCM Token Refresh: " + FirebaseInstanceId.getInstance().token)
-        EventosAplicacion.appContext = applicationContext
+        Log.e("Comun", "--------FCM Token Refresh: " + FirebaseInstanceId.getInstance().token)
+        Comun.appContext = applicationContext
     }
 
 

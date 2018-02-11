@@ -13,8 +13,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import es.elb4t.eventosv2.EventosAplicacion.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
-import es.elb4t.eventosv2.EventosAplicacion.Companion.mostrarDialogo
+import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
+import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import es.elb4t.eventosv2.adapter.AdaptadorEventos
 import es.elb4t.eventosv2.model.Evento
 import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
