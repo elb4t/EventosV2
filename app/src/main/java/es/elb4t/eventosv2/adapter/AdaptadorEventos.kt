@@ -7,19 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.squareup.picasso.Picasso
 import es.elb4t.eventosv2.R
-import es.elb4t.eventosv2.model.EventoItem
+import es.elb4t.eventosv2.model.Evento
 
 /**
  * Created by eloy on 10/2/18.
  */
-class EventosRecyclerAdapter(private val mContext: Context, options: FirebaseRecyclerOptions<EventoItem>) :
-        FirebaseRecyclerAdapter<EventoItem, EventosRecyclerAdapter.EventoViewHolder>(options) {
+class AdaptadorEventos(private val mContext: Context, options: FirestoreRecyclerOptions<Evento>) :
+        FirestoreRecyclerAdapter<Evento, AdaptadorEventos.EventoViewHolder>(options) {
 
-    override fun onBindViewHolder(holder: EventoViewHolder, position: Int, item: EventoItem) {
+    override fun onBindViewHolder(holder: EventoViewHolder, position: Int, item: Evento) {
         val txtEvento = item.evento
         val txtCiudad = item.ciudad
         val txtFecha = item.fecha
@@ -38,7 +38,7 @@ class EventosRecyclerAdapter(private val mContext: Context, options: FirebaseRec
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventoViewHolder {
-        val view = LayoutInflater.from(parent.context)
+         val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.evento, parent, false) as ViewGroup
         return EventoViewHolder(view)
     }

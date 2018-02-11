@@ -1,28 +1,29 @@
 package es.elb4t.eventosv2
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
-import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import es.elb4t.eventosv2.EventosAplicacion.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
-import es.elb4t.eventosv2.EventosAplicacion.Companion.itemsReference
 import es.elb4t.eventosv2.EventosAplicacion.Companion.mostrarDialogo
-import es.elb4t.eventosv2.adapter.EventosRecyclerAdapter
-import es.elb4t.eventosv2.adapter.EventosRecyclerAdapter.EventoViewHolder
-import es.elb4t.eventosv2.model.EventoItem
+import es.elb4t.eventosv2.adapter.AdaptadorEventos
+import es.elb4t.eventosv2.model.Evento
+import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
+import es.elb4t.eventosv2.utils.EventosFirestore.crearEventos
 import kotlinx.android.synthetic.main.activity_actividad_principal.*
 
 
 class ActividadPrincipal : AppCompatActivity() {
-    private lateinit var databaseReference: DatabaseReference
-    private var adapter: FirebaseRecyclerAdapter<EventoItem, EventoViewHolder>? = null
-    private var current: ActividadPrincipal? = null
+    private var adapter: AdaptadorEventos? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,13 +36,15 @@ class ActividadPrincipal : AppCompatActivity() {
             Toast.makeText(this, "Error Google Play Services: no está instalado o no es válido.", Toast.LENGTH_LONG)
             finish()
         }
+        crearEventos()
+        var query: Query = FirebaseFirestore.getInstance()
+                .collection(EVENTOS)
+                .limit(50)
 
-        databaseReference = itemsReference!!
-
-        val options = FirebaseRecyclerOptions.Builder<EventoItem>()
-                .setQuery(databaseReference, EventoItem::class.java)
+        val options = FirestoreRecyclerOptions.Builder<Evento>()
+                .setQuery(query, Evento::class.java)
                 .build()
-        adapter = EventosRecyclerAdapter(this, options)
+        adapter = AdaptadorEventos(this, options)
         reciclerViewEventos.layoutManager = LinearLayoutManager(this)
         reciclerViewEventos.adapter = adapter
     }
@@ -63,16 +66,11 @@ class ActividadPrincipal : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         adapter!!.startListening()
-        current = this
     }
 
     override fun onStop() {
         super.onStop()
         adapter!!.stopListening()
-    }
-
-    fun getCurrentContext(): ActividadPrincipal {
-        return current!!
     }
 
     override fun onResume() {
@@ -90,5 +88,20 @@ class ActividadPrincipal : AppCompatActivity() {
             }
             extras.clear()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_principal, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.action_temas) {
+            val intent = Intent(baseContext, Temas::class.java)
+            startActivity(intent)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

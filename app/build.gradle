@@ -36,8 +36,8 @@ dependencies {
     //Firebase
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
-    implementation 'com.google.firebase:firebase-database:11.8.0'
-    implementation 'com.firebaseui:firebase-ui-database:3.2.1'
+    implementation 'com.google.firebase:firebase-firestore:11.8.0'
+    implementation 'com.firebaseui:firebase-ui-firestore:3.2.1'
     implementation 'com.google.android.gms:play-services-identity:11.8.0'
     // Utils
     implementation 'com.squareup.picasso:picasso:2.5.2'

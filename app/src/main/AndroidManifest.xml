@@ -49,6 +49,7 @@
         </service>
 
         <activity android:name=".utils.Dialogo" />
+        <activity android:name=".Temas" />
 
     </application>
 

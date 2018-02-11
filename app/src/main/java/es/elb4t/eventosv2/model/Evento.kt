@@ -4,8 +4,7 @@ package es.elb4t.eventosv2.model
  * Created by eloy on 10/2/18.
  */
 
-class EventoItem {
-    var id: String? = null
+class Evento {
     var evento: String? = null
     var ciudad: String? = null
     var fecha: String? = null
@@ -13,9 +12,8 @@ class EventoItem {
 
     constructor() {}
 
-    constructor(id: String, evento: String, ciudad: String,
+    constructor(evento: String, ciudad: String,
                 fecha: String, imagen: String) {
-        this.id = id
         this.evento = evento
         this.ciudad = ciudad
         this.fecha = fecha

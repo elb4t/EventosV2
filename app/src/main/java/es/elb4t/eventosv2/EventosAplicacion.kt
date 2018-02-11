@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
 import es.elb4t.eventosv2.utils.Dialogo
 import es.elb4t.eventosv2.utils.RequestVolley
@@ -25,8 +23,6 @@ class EventosAplicacion : Application() {
         var idRegistro = ""
 
         internal val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
-        var itemsReference: DatabaseReference? = null
-            private set
         var appContext: Context? = null
             private set
         fun mostrarDialogo(context: Context, mensaje: String) {
@@ -52,9 +48,6 @@ class EventosAplicacion : Application() {
         super.onCreate()
         Log.e("EventosAplicacion", "--------FCM Token Refresh: " + FirebaseInstanceId.getInstance().token)
         EventosAplicacion.appContext = applicationContext
-        val database = FirebaseDatabase.getInstance()
-        database.setPersistenceEnabled(true)
-        itemsReference = database.getReference(ITEMS_CHILD_NAME)
     }
 
 
