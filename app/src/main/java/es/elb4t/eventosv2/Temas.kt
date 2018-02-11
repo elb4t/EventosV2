@@ -3,7 +3,9 @@ package es.elb4t.eventosv2
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
+import es.elb4t.eventosv2.Comun.Companion.guardarIdRegistro
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import kotlinx.android.synthetic.main.temas.*
 
@@ -17,14 +19,14 @@ class Temas : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.temas)
 
-        checkBoxDeportes.isChecked = consultarSuscripcionATemaEnPreferencias(
-                applicationContext, "Deportes")
-        checkBoxTeatro.isChecked = consultarSuscripcionATemaEnPreferencias(
-                applicationContext, "Teatro")
-        checkBoxCine.isChecked = consultarSuscripcionATemaEnPreferencias(
-                applicationContext, "Cine")
-        checkBoxFiestas.isChecked = consultarSuscripcionATemaEnPreferencias(
-                applicationContext, "Fiestas")
+        var noRecibirNotificaciones = consultarSuscripcionATemaEnPreferencias(
+                applicationContext, "Todos")
+        checkBoxNoRecibirNotificaciones.isChecked = noRecibirNotificaciones
+
+        checkBoxDeportes.isChecked = !noRecibirNotificaciones
+        checkBoxTeatro.isChecked = !noRecibirNotificaciones
+        checkBoxCine.isChecked = !noRecibirNotificaciones
+        checkBoxFiestas.isChecked = !noRecibirNotificaciones
 
         checkBoxDeportes.setOnCheckedChangeListener({ compoundButton, isChecked ->
             mantenimientoSuscripcionesATemas("Deportes", isChecked)
@@ -38,17 +40,39 @@ class Temas : AppCompatActivity() {
         checkBoxFiestas.setOnCheckedChangeListener({ compoundButton, isChecked ->
             mantenimientoSuscripcionesATemas("Fiestas", isChecked)
         })
+        checkBoxNoRecibirNotificaciones.setOnCheckedChangeListener { compoundButton, isChecked ->
+            mantenimientoSuscripcionesATemas("Todos", isChecked)
+        }
     }
 
     private fun mantenimientoSuscripcionesATemas(tema: String, suscribir: Boolean) {
-        if (suscribir) {
-            mostrarDialogo(this, "Te has suscrito a: $tema")
-            FirebaseMessaging.getInstance().subscribeToTopic(tema)
-            guardarSuscripcionATemaEnPreferencias(applicationContext, tema, true)
+        if (tema.equals("Todos")) {
+            if (suscribir) {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(tema)
+                guardarSuscripcionATemaEnPreferencias(applicationContext, tema, true)
+                checkBoxDeportes.isChecked = false
+                checkBoxTeatro.isChecked = false
+                checkBoxCine.isChecked = false
+                checkBoxFiestas.isChecked = false
+            } else {
+                FirebaseMessaging.getInstance().subscribeToTopic(tema)
+                guardarIdRegistro(applicationContext, FirebaseInstanceId.getInstance().token!!)
+                guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
+            }
+            checkBoxDeportes.isEnabled = !suscribir
+            checkBoxTeatro.isEnabled = !suscribir
+            checkBoxCine.isEnabled = !suscribir
+            checkBoxFiestas.isEnabled = !suscribir
         } else {
-            mostrarDialogo(this, "Te has dado de baja de: $tema")
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(tema)
-            guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
+            if (suscribir) {
+                mostrarDialogo(this, "Te has suscrito a: $tema")
+                FirebaseMessaging.getInstance().subscribeToTopic(tema)
+                guardarSuscripcionATemaEnPreferencias(applicationContext, tema, true)
+            } else {
+                mostrarDialogo(this, "Te has dado de baja de: $tema")
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(tema)
+                guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
+            }
         }
     }
 

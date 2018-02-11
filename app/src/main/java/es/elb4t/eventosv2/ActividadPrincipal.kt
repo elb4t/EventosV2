@@ -1,5 +1,6 @@
 package es.elb4t.eventosv2
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -13,6 +14,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.messaging.FirebaseMessaging
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import es.elb4t.eventosv2.adapter.AdaptadorEventos
@@ -20,6 +22,8 @@ import es.elb4t.eventosv2.model.Evento
 import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
 import es.elb4t.eventosv2.utils.EventosFirestore.crearEventos
 import kotlinx.android.synthetic.main.activity_actividad_principal.*
+
+
 
 
 class ActividadPrincipal : AppCompatActivity() {
@@ -47,6 +51,16 @@ class ActividadPrincipal : AppCompatActivity() {
         adapter = AdaptadorEventos(this, options)
         reciclerViewEventos.layoutManager = LinearLayoutManager(this)
         reciclerViewEventos.adapter = adapter
+
+        val preferencias = applicationContext.getSharedPreferences("Temas", Context.MODE_PRIVATE)
+        if (!preferencias.getBoolean("Inicializado", false)) {
+            val prefs = applicationContext.getSharedPreferences(
+                    "Temas", Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            editor.putBoolean("Inicializado", true)
+            editor.commit()
+            FirebaseMessaging.getInstance().subscribeToTopic("Todos")
+        }
     }
 
     private fun comprobarGooglePlayServices(): Boolean {
