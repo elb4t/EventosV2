@@ -42,6 +42,7 @@ class RequestVolley(private val context: Context?) {
         val request = object : StringRequest(Request.Method.GET, path,
                 Response.Listener { response ->
                     Log.e(TAG, "/post $path request OK!")
+                    Log.e(TAG, "Params: ${params["idapp"]} ||| ${params["iddevice"]}")
                     Log.e(TAG, "Code: $mStatusCode - Response: $response")
                     completionHandler(response.toString(), mStatusCode)
                 }, Response.ErrorListener { error ->
