@@ -118,4 +118,8 @@ class ActividadPrincipal : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun getAppContext(): Context {
+        return ActividadPrincipal().getAppContext()
+    }
 }

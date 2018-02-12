@@ -1,6 +1,7 @@
 package es.elb4t.eventosv2.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +11,14 @@ import android.widget.TextView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.squareup.picasso.Picasso
+import es.elb4t.eventosv2.EventoDetalles
 import es.elb4t.eventosv2.R
 import es.elb4t.eventosv2.model.Evento
 
 /**
  * Created by eloy on 10/2/18.
  */
-class AdaptadorEventos(private val mContext: Context, options: FirestoreRecyclerOptions<Evento>) :
+class AdaptadorEventos(private val mContext: Context, val options: FirestoreRecyclerOptions<Evento>) :
         FirestoreRecyclerAdapter<Evento, AdaptadorEventos.EventoViewHolder>(options) {
 
     override fun onBindViewHolder(holder: EventoViewHolder, position: Int, item: Evento) {
@@ -35,6 +37,13 @@ class AdaptadorEventos(private val mContext: Context, options: FirestoreRecycler
                 .centerCrop()
                 .onlyScaleDown()
                 .into(holder.imagen)
+        holder.itemView.setOnClickListener {
+            val idEvento = options.snapshots.getSnapshot(position).id
+            val intent = Intent(mContext, EventoDetalles::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.putExtra("evento",idEvento)
+            mContext.startActivity(intent)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventoViewHolder {
