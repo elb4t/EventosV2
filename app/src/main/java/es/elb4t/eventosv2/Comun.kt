@@ -42,6 +42,17 @@ class Comun : Application() {
                     Toast.makeText(appContext,"Error al registrar el dispositivo", Toast.LENGTH_SHORT).show()
             }
         }
+        fun eliminarIdRegistro(context: Context) {
+            val parametros = HashMap<String,String>()
+            parametros["iddevice"] = FirebaseInstanceId.getInstance().token!!
+            parametros["idapp"] = ID_PROYECTO
+            RequestVolley(context).post(URL_SERVIDOR + "desregistrar.php",parametros){response, code ->
+                if (code == 200 &&  !response.contains("Duplicate entry '' for key 'PRIMARY'"))
+                    Toast.makeText(appContext,"Dispositivo eliminado correctamente", Toast.LENGTH_SHORT).show()
+                else
+                    Toast.makeText(appContext,"Error al registrar el dispositivo", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onCreate() {

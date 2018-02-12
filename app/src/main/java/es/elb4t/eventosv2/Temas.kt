@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
+import es.elb4t.eventosv2.Comun.Companion.eliminarIdRegistro
 import es.elb4t.eventosv2.Comun.Companion.guardarIdRegistro
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import kotlinx.android.synthetic.main.temas.*
@@ -48,6 +49,7 @@ class Temas : AppCompatActivity() {
     private fun mantenimientoSuscripcionesATemas(tema: String, suscribir: Boolean) {
         if (tema.equals("Todos")) {
             if (suscribir) {
+                eliminarIdRegistro(applicationContext)
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(tema)
                 guardarSuscripcionATemaEnPreferencias(applicationContext, tema, true)
                 checkBoxDeportes.isChecked = false
