@@ -49,7 +49,7 @@ class ActividadPrincipal : AppCompatActivity() {
                 .setQuery(query, Evento::class.java)
                 .build()
         adapter = AdaptadorEventos(this, options)
-        reciclerViewEventos.layoutManager = LinearLayoutManager(this)
+        reciclerViewEventos.layoutManager = LinearLayoutManager(this) as LinearLayoutManager
         reciclerViewEventos.adapter = adapter
 
         val preferencias = applicationContext.getSharedPreferences("Temas", Context.MODE_PRIVATE)
@@ -113,6 +113,10 @@ class ActividadPrincipal : AppCompatActivity() {
         val id = item.itemId
         if (id == R.id.action_temas) {
             val intent = Intent(baseContext, Temas::class.java)
+            startActivity(intent)
+            return true
+        }else if (id == R.id.enviarEvento){
+            val intent = Intent(baseContext, EnviarEvento::class.java)
             startActivity(intent)
             return true
         }

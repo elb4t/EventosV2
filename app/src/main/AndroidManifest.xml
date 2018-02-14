@@ -58,12 +58,17 @@
 
         <activity android:name=".utils.Dialogo" />
         <activity android:name=".Temas" />
-        <activity android:name=".EventoDetalles" >
+        <activity android:name=".EventoDetalles">
             <intent-filter>
                 <action android:name="OPEN_ACTIVITY_1" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".EnviarEvento"
+            android:label="@string/title_activity_enviar_evento"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@ package es.elb4t.eventosv2
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import es.elb4t.eventosv2.Comun.Companion.eliminarIdRegistro
@@ -58,6 +59,7 @@ class Temas : AppCompatActivity() {
                 checkBoxFiestas.isChecked = false
             } else {
                 FirebaseMessaging.getInstance().subscribeToTopic(tema)
+                Log.e("__________","token: "+FirebaseInstanceId.getInstance().token!!)
                 guardarIdRegistro(applicationContext, FirebaseInstanceId.getInstance().token!!)
                 guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
             }

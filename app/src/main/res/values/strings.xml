@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Eventos V2</string>
+    <string name="title_activity_enviar_evento">EnviarEvento</string>
 </resources>

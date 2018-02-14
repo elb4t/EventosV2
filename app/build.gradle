@@ -41,6 +41,6 @@ dependencies {
     implementation 'com.google.android.gms:play-services-identity:11.8.0'
     // Utils
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.android.volley:volley:1.1.0'
+    implementation 'com.android.volley:volley:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

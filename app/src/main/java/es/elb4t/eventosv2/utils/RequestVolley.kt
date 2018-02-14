@@ -2,7 +2,9 @@ package es.elb4t.eventosv2.utils
 
 import android.content.Context
 import android.util.Log
-import com.android.volley.*
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 
@@ -39,7 +41,7 @@ class RequestVolley(private val context: Context?) {
      * @return response, code - String con el resultado de la petición - Codigo de respuesta del servidor.
      */
     fun post(path: String, params: HashMap<String,String>, completionHandler: (response: String, code: Int) -> Unit) {
-        val request = object : StringRequest(Request.Method.GET, path,
+        val request = object : StringRequest(Request.Method.POST, path,
                 Response.Listener { response ->
                     Log.e(TAG, "/post $path request OK!")
                     Log.e(TAG, "Params: ${params["idapp"]} ||| ${params["iddevice"]}")
@@ -51,12 +53,6 @@ class RequestVolley(private val context: Context?) {
                     Log.e(TAG, "Response: $resp")
                     completionHandler(resp, error.networkResponse.statusCode)
         }) {
-            override fun parseNetworkResponse(response: NetworkResponse): Response<String> {
-                mStatusCode = response.statusCode
-                return super.parseNetworkResponse(response)
-            }
-
-            @Throws(AuthFailureError::class)
             override fun getParams(): MutableMap<String, String> {
                 return params
             }
