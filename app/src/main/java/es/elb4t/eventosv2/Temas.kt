@@ -69,11 +69,11 @@ class Temas : AppCompatActivity() {
             checkBoxFiestas.isEnabled = !suscribir
         } else {
             if (suscribir) {
-                mostrarDialogo(this, "Te has suscrito a: $tema")
+                mostrarDialogo(this, "Te has suscrito a: $tema", "")
                 FirebaseMessaging.getInstance().subscribeToTopic(tema)
                 guardarSuscripcionATemaEnPreferencias(applicationContext, tema, true)
             } else {
-                mostrarDialogo(this, "Te has dado de baja de: $tema")
+                mostrarDialogo(this, "Te has dado de baja de: $tema", "")
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(tema)
                 guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
             }

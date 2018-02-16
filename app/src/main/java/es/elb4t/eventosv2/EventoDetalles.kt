@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
@@ -32,7 +33,7 @@ class EventoDetalles : AppCompatActivity() {
 
         registros = FirebaseFirestore.getInstance().collection("eventos")
         registros!!.document(evento!!).get().addOnCompleteListener({
-            if (it.isSuccessful){
+            if (it.isSuccessful && it.result.exists()){
                 txtEvento!!.text = it.result.get("evento").toString()
                 txtCiudad!!.text = it.result.get("ciudad").toString()
                 txtFecha!!.text = it.result.get("fecha").toString()
@@ -44,6 +45,9 @@ class EventoDetalles : AppCompatActivity() {
                         .centerCrop()
                         .onlyScaleDown()
                         .into(imgImagen)
+            }else {
+                Toast.makeText(applicationContext, "El índice de evento solicitado no es válido", Toast.LENGTH_SHORT).show()
+                finish()
             }
         })
 

@@ -18,10 +18,10 @@ class EventosFCMService : FirebaseMessagingService() {
                     remoteMessage.data["ciudad"] + "\n"
             evento = (evento + "Comentario: "
                     + remoteMessage.data["comentario"])
-            mostrarDialogo(applicationContext, evento)
+            mostrarDialogo(applicationContext, evento, remoteMessage.data["evento"]!!)
         } else {
             if (remoteMessage.notification != null) {
-                mostrarDialogo(applicationContext, remoteMessage.notification!!.body!!)
+                mostrarDialogo(applicationContext, remoteMessage.notification!!.body!!, "")
             }
         }
     }

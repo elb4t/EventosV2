@@ -25,10 +25,11 @@ class Comun : Application() {
         internal val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
         var appContext: Context? = null
             private set
-        fun mostrarDialogo(context: Context, mensaje: String) {
+        fun mostrarDialogo(context: Context, mensaje: String, extras: String) {
             val intent = Intent(context, Dialogo::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.putExtra("mensaje", mensaje)
+            intent.putExtra("extras", extras)
             context.startActivity(intent)
         }
         fun guardarIdRegistro(context: Context, idRegistro: String) {

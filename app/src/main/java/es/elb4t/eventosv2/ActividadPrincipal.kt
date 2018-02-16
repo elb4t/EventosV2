@@ -96,7 +96,7 @@ class ActividadPrincipal : AppCompatActivity() {
             evento = evento + "Día: " + extras.getString("dia") + "\n"
             evento = evento + "Ciudad: " + extras.getString("ciudad") + "\n"
             evento = evento + "Comentario: " + extras.getString("comentario")
-            mostrarDialogo(applicationContext, evento)
+            mostrarDialogo(applicationContext, evento, extras.getString("evento") ?: "")
             for (key in extras.keySet()) {
                 intent.removeExtra(key)
             }

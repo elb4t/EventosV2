@@ -1,8 +1,10 @@
 package es.elb4t.eventosv2.utils
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import es.elb4t.eventosv2.EventoDetalles
 
 
 /**
@@ -19,6 +21,12 @@ class Dialogo : AppCompatActivity() {
             alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "CERRAR",
                     { dialog, which ->
                         dialog.dismiss()
+                        if (intent.hasExtra("extras") &&  extras.getString("extras") != "") {
+                            val intent = Intent(applicationContext, EventoDetalles::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            intent.putExtra("evento", extras.getString("extras"))
+                            startActivity(intent)
+                        }
                         finish()
                     })
             alertDialog.show()
