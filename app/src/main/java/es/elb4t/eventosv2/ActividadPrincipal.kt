@@ -15,15 +15,16 @@ import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.storage.FirebaseStorage
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
+import es.elb4t.eventosv2.Comun.Companion.storage
+import es.elb4t.eventosv2.Comun.Companion.storageRef
 import es.elb4t.eventosv2.adapter.AdaptadorEventos
 import es.elb4t.eventosv2.model.Evento
 import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
 import es.elb4t.eventosv2.utils.EventosFirestore.crearEventos
 import kotlinx.android.synthetic.main.activity_actividad_principal.*
-
-
 
 
 class ActividadPrincipal : AppCompatActivity() {
@@ -61,6 +62,9 @@ class ActividadPrincipal : AppCompatActivity() {
             editor.commit()
             FirebaseMessaging.getInstance().subscribeToTopic("Todos")
         }
+
+        storage = FirebaseStorage.getInstance()
+        storageRef = storage.getReferenceFromUrl("gs://eventos-3161f.appspot.com/")
     }
 
     private fun comprobarGooglePlayServices(): Boolean {
@@ -115,7 +119,7 @@ class ActividadPrincipal : AppCompatActivity() {
             val intent = Intent(baseContext, Temas::class.java)
             startActivity(intent)
             return true
-        }else if (id == R.id.enviarEvento){
+        } else if (id == R.id.enviarEvento) {
             val intent = Intent(baseContext, EnviarEvento::class.java)
             startActivity(intent)
             return true

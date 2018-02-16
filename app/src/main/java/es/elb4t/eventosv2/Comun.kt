@@ -6,8 +6,12 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import es.elb4t.eventosv2.utils.Dialogo
 import es.elb4t.eventosv2.utils.RequestVolley
+
+
 
 
 /**
@@ -21,6 +25,9 @@ class Comun : Application() {
         val URL_SERVIDOR = "http://cursoandroid.hol.es/notificaciones/"
         var ID_PROYECTO = "eventos-3161f"
         var idRegistro = ""
+
+        lateinit var storage: FirebaseStorage
+        lateinit var storageRef: StorageReference
 
         internal val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
         var appContext: Context? = null
@@ -53,6 +60,10 @@ class Comun : Application() {
                 else
                     Toast.makeText(appContext,"Error al registrar el dispositivo", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        fun getStorageReference(): StorageReference {
+            return storageRef
         }
     }
 
