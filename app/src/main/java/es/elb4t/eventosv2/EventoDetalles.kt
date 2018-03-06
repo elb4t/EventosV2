@@ -2,6 +2,7 @@ package es.elb4t.eventosv2
 
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -19,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
@@ -38,7 +40,6 @@ class EventoDetalles : AppCompatActivity() {
     var evento: String? = null
     var registros: CollectionReference? = null
     val SOLICITUD_SUBIR_PUTDATA = 0
-    val solicitud_subir_putdata = 0
     val SOLICITUD_SUBIR_PUTSTREAM = 1
     val SOLICITUD_SUBIR_PUTFILE = 2
     val SOLICITUD_SELECCION_STREAM = 100
@@ -106,7 +107,6 @@ class EventoDetalles : AppCompatActivity() {
                     subirAFirebaseStorage(SOLICITUD_SUBIR_PUTSTREAM, rutaImagen)
                 }
                 SOLICITUD_SELECCION_PUTFILE -> {
-                    Log.e("EVENTO", "PUT FILE")
                     ficheroSeleccionado = data!!.data
                     val proyeccionFile = arrayOf(MediaStore.Images.Media.DATA)
                     cursor = contentResolver.query(ficheroSeleccionado, proyeccionFile, null, null, null)
@@ -144,7 +144,15 @@ class EventoDetalles : AppCompatActivity() {
     }
 
     fun subirAFirebaseStorage(opcion: Int, ficheroDispositivo: String?) {
-        Log.e("EVENTO","subir a firebase- opción: $opcion :: fichero: $ficheroDispositivo")
+        var progresoSubida: ProgressDialog = ProgressDialog(this)
+        progresoSubida.setTitle("Subiendo...")
+        progresoSubida.setMessage("Espere...")
+        progresoSubida.setCancelable(true)
+        progresoSubida.setCanceledOnTouchOutside(false)
+        progresoSubida.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar", { dialogInterface, i ->
+            uploadTask!!.cancel()
+        })
+
         var fichero: String = evento!!
         imagenRef = getStorageReference().child(fichero)
         try {
@@ -163,15 +171,48 @@ class EventoDetalles : AppCompatActivity() {
                     uploadTask = imagenRef.putStream(stream)
                 }
                 SOLICITUD_SUBIR_PUTFILE -> {
-                    Log.e("EVENTO","subir put file")
+                    Log.e("EVENTO", "subir put file")
                     var file: Uri = Uri.fromFile(File(ficheroDispositivo))
                     uploadTask = imagenRef.putFile(file)
-                    Log.e("EVENTO","subir put file end")
+                    Log.e("EVENTO", "subir put file end")
                 }
             }
 
-        }catch (e: Exception){
-            mostrarDialogo(applicationContext, e.toString(),"")
+            uploadTask!!.addOnFailureListener {
+                subiendoDatos = false
+                mostrarDialogo(applicationContext,
+                        "Ha ocurrido un error al subir la imagen o el usuario ha cancelado la subida.", "")
+            }.addOnSuccessListener {
+                var datos: HashMap<String, String> = hashMapOf()
+                datos.put("imagen", it.downloadUrl.toString())
+                FirebaseFirestore.getInstance().collection("eventos")
+                        .document(evento!!).set(datos.toMap(), SetOptions.merge())
+                Picasso.with(applicationContext)
+                        .load(it.downloadUrl.toString())
+                        .error(R.mipmap.ic_launcher_round)
+                        //.networkPolicy(NetworkPolicy.NO_CACHE)
+                        .resize(300, 200)
+                        .centerCrop()
+                        .onlyScaleDown()
+                        .into(imgImagen)
+                progresoSubida.dismiss()
+                subiendoDatos = false
+                mostrarDialogo(applicationContext, "Imagen subida correctamente.", "")
+            }.addOnProgressListener {
+                if (!subiendoDatos!!) {
+                    progresoSubida.show()
+                    subiendoDatos = true
+                } else {
+                    if (it.totalByteCount > 0) {
+                        progresoSubida.setMessage("Espere... " + (100 * it.bytesTransferred / it.totalByteCount) + "%")
+                    }
+                }
+            }.addOnPausedListener {
+                subiendoDatos = false
+                mostrarDialogo(applicationContext, "La subida ha sido pausada.", "")
+            }
+        } catch (e: Exception) {
+            mostrarDialogo(applicationContext, e.toString(), "")
         }
     }
 }
