@@ -21,6 +21,7 @@ import android.widget.Toast
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
@@ -214,5 +215,78 @@ class EventoDetalles : AppCompatActivity() {
         } catch (e: Exception) {
             mostrarDialogo(applicationContext, e.toString(), "")
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        if (imagenRef != null) {
+            outState!!.putString("EXTRA_STORAGE_REFERENCE_KEY", imagenRef.toString())
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        var stringRef: String = savedInstanceState!!.getString("EXTRA_STORAGE_REFERENCE_KEY")
+        if (stringRef == null) {
+            return
+        }
+        imagenRef = FirebaseStorage.getInstance().getReferenceFromUrl(stringRef)
+        var tasks: List<UploadTask> = imagenRef.activeUploadTasks
+
+        for (task in tasks) {
+            task.addOnFailureListener { exception ->
+                upload_error(exception)
+            }.addOnSuccessListener { taskSnapshot ->
+                upload_exito(taskSnapshot)
+            }.addOnProgressListener { taskSnapshot ->
+                upload_progreso(taskSnapshot)
+            }.addOnPausedListener { taskSnapshot ->
+                upload_pausa(taskSnapshot)
+            }
+        }
+    }
+
+    private fun upload_pausa(taskSnapshot: UploadTask.TaskSnapshot) {
+        subiendoDatos = false
+        mostrarDialogo(applicationContext, "La subida ha sido pausada.","")
+    }
+
+    private fun upload_progreso(taskSnapshot: UploadTask.TaskSnapshot) {
+        if (!subiendoDatos!!){
+            var progresoSubida: ProgressDialog = ProgressDialog(this)
+            progresoSubida.setTitle("Subiendo...")
+            progresoSubida.setMessage("Espere...")
+            progresoSubida.setCancelable(true)
+            progresoSubida.setCanceledOnTouchOutside(false)
+            progresoSubida.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar", { dialogInterface, i ->
+                uploadTask!!.cancel()
+            })
+            progresoSubida.show()
+            subiendoDatos = true
+        }
+    }
+
+    private fun upload_error(exception: Exception){
+        subiendoDatos=false
+        mostrarDialogo(applicationContext,
+                "Ha ocurrido un error al subir la imagen o el usuario ha cancelado la subida.","")
+    }
+
+    private fun upload_exito(taskSnapshot: UploadTask.TaskSnapshot ){
+         var datos: HashMap<String, String> = hashMapOf()
+         datos.put("imagen", taskSnapshot.downloadUrl.toString())
+         FirebaseFirestore.getInstance().collection("eventos")
+                 .document(evento!!).set(datos.toMap(), SetOptions.merge())
+         Picasso.with(applicationContext)
+                 .load(taskSnapshot.downloadUrl.toString())
+                 .error(R.mipmap.ic_launcher_round)
+                 //.networkPolicy(NetworkPolicy.NO_CACHE)
+                 .resize(300, 200)
+                 .centerCrop()
+                 .onlyScaleDown()
+                 .into(imgImagen)
+         progresoSubida!!.dismiss()
+         subiendoDatos = false
+         mostrarDialogo(applicationContext, "Imagen subida correctamente.", "")
     }
 }
