@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+
 
     <application
         android:name=".Comun"
@@ -69,7 +71,9 @@
         <activity
             android:name=".EnviarEvento"
             android:label="@string/title_activity_enviar_evento"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".FotografiasDrive"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

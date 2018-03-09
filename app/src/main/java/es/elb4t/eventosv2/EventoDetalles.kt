@@ -47,6 +47,7 @@ class EventoDetalles : AppCompatActivity() {
     val SOLICITUD_SUBIR_PUTFILE = 2
     val SOLICITUD_SELECCION_STREAM = 100
     val SOLICITUD_SELECCION_PUTFILE = 101
+    val SOLICITUD_FOTOGRAFIAS_DRIVE = 102
     val progresoSubida: ProgressDialog? = null
     var subiendoDatos: Boolean? = false
     lateinit var imagenRef: StorageReference
@@ -137,6 +138,11 @@ class EventoDetalles : AppCompatActivity() {
             R.id.action_putFile -> seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_PUTFILE)
             R.id.action_getFile -> descargarDeFirebaseStorage(evento!!)
             R.id.action_deleteFile -> eliminarDeFirebaseStorage(evento!!)
+            R.id.action_fotografiasDrive -> {
+                val intent = Intent(baseContext, FotografiasDrive::class.java)
+                intent.putExtra("evento", evento)
+                startActivity(intent)
+            }
         }
 
         return super.onOptionsItemSelected(item)

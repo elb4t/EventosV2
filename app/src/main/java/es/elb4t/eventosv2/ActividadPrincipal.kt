@@ -9,7 +9,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -70,14 +69,19 @@ class ActividadPrincipal : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         storageRef = storage.getReferenceFromUrl("gs://eventos-3161f.appspot.com/")
 
-        comprobarPermisoStorege()
+        comprobarPermisos()
     }
 
-    private fun comprobarPermisoStorege() {
+    private fun comprobarPermisos() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+        }
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.GET_ACCOUNTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(android.Manifest.permission.GET_ACCOUNTS), 2)
         }
     }
 
@@ -147,16 +151,24 @@ class ActividadPrincipal : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
-        Log.e("REQU CODE",requestCode.toString())
         when (requestCode) {
             1 -> {
                 if (!(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     Snackbar.make(reciclerViewEventos,
                             "Has denegado algún permiso de la aplicación.", Snackbar.LENGTH_LONG)
                             .setAction("Activar", {
-                                comprobarPermisoStorege()
+                                comprobarPermisos()
                             }).show()
-                    Log.e("IF","permiso denegado")
+                }
+                return
+            }
+            2 -> {
+                if (!(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    Snackbar.make(reciclerViewEventos,
+                            "Has denegado algún permiso de la aplicación.", Snackbar.LENGTH_LONG)
+                            .setAction("Activar", {
+                                comprobarPermisos()
+                            }).show()
                 }
                 return
             }
