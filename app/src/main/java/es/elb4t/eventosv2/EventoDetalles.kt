@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -27,6 +28,7 @@ import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import es.elb4t.eventosv2.Comun.Companion.getStorageReference
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
+import es.elb4t.eventosv2.Comun.Companion.storage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -88,7 +90,7 @@ class EventoDetalles : AppCompatActivity() {
                 finish()
             }
         })
-
+        imagenRef = storage.reference
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -133,6 +135,8 @@ class EventoDetalles : AppCompatActivity() {
             R.id.action_putData -> subirAFirebaseStorage(SOLICITUD_SUBIR_PUTDATA, null)
             R.id.action_streamData -> seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_STREAM)
             R.id.action_putFile -> seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_PUTFILE)
+            R.id.action_getFile -> descargarDeFirebaseStorage(evento!!)
+            R.id.action_deleteFile -> eliminarDeFirebaseStorage(evento!!)
         }
 
         return super.onOptionsItemSelected(item)
@@ -248,11 +252,11 @@ class EventoDetalles : AppCompatActivity() {
 
     private fun upload_pausa(taskSnapshot: UploadTask.TaskSnapshot) {
         subiendoDatos = false
-        mostrarDialogo(applicationContext, "La subida ha sido pausada.","")
+        mostrarDialogo(applicationContext, "La subida ha sido pausada.", "")
     }
 
     private fun upload_progreso(taskSnapshot: UploadTask.TaskSnapshot) {
-        if (!subiendoDatos!!){
+        if (!subiendoDatos!!) {
             var progresoSubida: ProgressDialog = ProgressDialog(this)
             progresoSubida.setTitle("Subiendo...")
             progresoSubida.setMessage("Espere...")
@@ -266,27 +270,54 @@ class EventoDetalles : AppCompatActivity() {
         }
     }
 
-    private fun upload_error(exception: Exception){
-        subiendoDatos=false
+    private fun upload_error(exception: Exception) {
+        subiendoDatos = false
         mostrarDialogo(applicationContext,
-                "Ha ocurrido un error al subir la imagen o el usuario ha cancelado la subida.","")
+                "Ha ocurrido un error al subir la imagen o el usuario ha cancelado la subida.", "")
     }
 
-    private fun upload_exito(taskSnapshot: UploadTask.TaskSnapshot ){
-         var datos: HashMap<String, String> = hashMapOf()
-         datos.put("imagen", taskSnapshot.downloadUrl.toString())
-         FirebaseFirestore.getInstance().collection("eventos")
-                 .document(evento!!).set(datos.toMap(), SetOptions.merge())
-         Picasso.with(applicationContext)
-                 .load(taskSnapshot.downloadUrl.toString())
-                 .error(R.mipmap.ic_launcher_round)
-                 //.networkPolicy(NetworkPolicy.NO_CACHE)
-                 .resize(300, 200)
-                 .centerCrop()
-                 .onlyScaleDown()
-                 .into(imgImagen)
-         progresoSubida!!.dismiss()
-         subiendoDatos = false
-         mostrarDialogo(applicationContext, "Imagen subida correctamente.", "")
+    private fun upload_exito(taskSnapshot: UploadTask.TaskSnapshot) {
+        var datos: HashMap<String, String> = hashMapOf()
+        datos.put("imagen", taskSnapshot.downloadUrl.toString())
+        FirebaseFirestore.getInstance().collection("eventos")
+                .document(evento!!).set(datos.toMap(), SetOptions.merge())
+        Picasso.with(applicationContext)
+                .load(taskSnapshot.downloadUrl.toString())
+                .error(R.mipmap.ic_launcher_round)
+                //.networkPolicy(NetworkPolicy.NO_CACHE)
+                .resize(300, 200)
+                .centerCrop()
+                .onlyScaleDown()
+                .into(imgImagen)
+        progresoSubida!!.dismiss()
+        subiendoDatos = false
+        mostrarDialogo(applicationContext, "Imagen subida correctamente.", "")
     }
+
+    fun descargarDeFirebaseStorage(fichero: String) {
+        var referenciaFichero = getStorageReference().child(fichero)
+        var rootPath: File = File(Environment.getExternalStorageDirectory(), "Eventos")
+        if (!rootPath.exists()) {
+            rootPath.mkdirs()
+        }
+        val localFile: File = File(rootPath, "$evento.jpg")
+        referenciaFichero.getFile(localFile).addOnSuccessListener {
+            mostrarDialogo(applicationContext, "Fichero descargado con éxito: " + localFile.toString(), "")
+        }.addOnFailureListener {
+            mostrarDialogo(applicationContext, "Error al descargar el fichero.", "")
+        }
+    }
+
+    fun eliminarDeFirebaseStorage(fichero: String) {
+        var storageRef = storage.getReferenceFromUrl("gs://eventos-3161f.appspot.com")
+        var referenciaFichero = storageRef.child(fichero)
+        referenciaFichero.delete()
+                .addOnSuccessListener {
+                    mostrarDialogo(applicationContext, "Fichero borrado con éxito", "")
+                }.addOnFailureListener {
+                    mostrarDialogo(applicationContext, "Error al borrar el fichero.", "")
+                }
+    }
+
+
 }

@@ -17,4 +17,14 @@
         android:orderInCategory="102"
         android:title="Subir Fichero"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_getFile"
+        android:orderInCategory="102"
+        android:title="Descargar Fichero"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_deleteFile"
+        android:orderInCategory="102"
+        android:title="Eliminar Fichero"
+        app:showAsAction="never" />
 </menu>
