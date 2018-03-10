@@ -32,6 +32,11 @@ import kotlinx.android.synthetic.main.activity_actividad_principal.*
 
 class ActividadPrincipal : AppCompatActivity() {
     private var adapter: AdaptadorEventos? = null
+    val PERMISOS = arrayOf(
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.GET_ACCOUNTS,
+            android.Manifest.permission.CAMERA
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,21 +74,9 @@ class ActividadPrincipal : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         storageRef = storage.getReferenceFromUrl("gs://eventos-3161f.appspot.com/")
 
-        comprobarPermisos()
+        ActivityCompat.requestPermissions(this, PERMISOS, 1)
     }
 
-    private fun comprobarPermisos() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-        }
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.GET_ACCOUNTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(android.Manifest.permission.GET_ACCOUNTS), 2)
-        }
-    }
 
     private fun comprobarGooglePlayServices(): Boolean {
         val resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
@@ -153,22 +146,16 @@ class ActividadPrincipal : AppCompatActivity() {
                                             permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             1 -> {
-                if (!(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Snackbar.make(reciclerViewEventos,
-                            "Has denegado algún permiso de la aplicación.", Snackbar.LENGTH_LONG)
-                            .setAction("Activar", {
-                                comprobarPermisos()
-                            }).show()
-                }
-                return
-            }
-            2 -> {
-                if (!(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Snackbar.make(reciclerViewEventos,
-                            "Has denegado algún permiso de la aplicación.", Snackbar.LENGTH_LONG)
-                            .setAction("Activar", {
-                                comprobarPermisos()
-                            }).show()
+                grantResults.forEach { result ->
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        Snackbar.make(reciclerViewEventos,
+                                "Hay permisos necesarios para la aplicación sin activar", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Activar", {
+                                    ActivityCompat.requestPermissions(this, PERMISOS, 1)
+                                }).show()
+
+                        return
+                    }
                 }
                 return
             }

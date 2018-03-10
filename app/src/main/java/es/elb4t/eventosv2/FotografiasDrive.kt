@@ -6,9 +6,13 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.provider.MediaStore
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
@@ -19,11 +23,13 @@ import android.widget.Toast
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
+import com.google.api.client.http.FileContent
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -46,10 +52,10 @@ class FotografiasDrive : AppCompatActivity() {
     val SOLICITUD_AUTORIZACION = 2
     val SOLICITUD_SELECCIONAR_FOTOGRAFIA = 3
     val SOLICITUD_HACER_FOTOGRAFIA = 4
-    private val uriFichero: Uri? = null
+    private var uriFichero: Uri? = null
 
-    private var idCarpeta:String? = ""
-    private var idCarpetaEvento:String? = ""
+    private var idCarpeta: String? = ""
+    private var idCarpetaEvento: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,8 +95,14 @@ class FotografiasDrive : AppCompatActivity() {
         val id = item.itemId
         when (id) {
             R.id.action_camara -> {
+                if (!noAutoriza) {
+                    hacerFoto(vista)
+                }
             }
             R.id.action_galeria -> {
+                if (!noAutoriza) {
+                    seleccionarFoto(vista)
+                }
             }
         }
         return super.onOptionsItemSelected(item)
@@ -137,8 +149,20 @@ class FotografiasDrive : AppCompatActivity() {
                 }
             }
             SOLICITUD_HACER_FOTOGRAFIA -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    guardarFicheroEnDrive(this.findViewById<View>(android.R.id.content))
+                }
             }
             SOLICITUD_SELECCIONAR_FOTOGRAFIA -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    var ficheroSeleccionado: Uri = data!!.data
+                    var proyeccion: Array<String> = arrayOf(MediaStore.Images.Media.DATA)
+                    var cursor: Cursor = managedQuery(ficheroSeleccionado, proyeccion, null, null, null)
+                    var column_index: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                    cursor.moveToFirst()
+                    uriFichero = Uri.fromFile(java.io.File(cursor.getString(column_index)))
+                    guardarFicheroEnDrive(this.findViewById<View>(android.R.id.content))
+                }
             }
             SOLICITUD_AUTORIZACION -> {
                 if (resultCode == Activity.RESULT_OK) {
@@ -194,6 +218,78 @@ class FotografiasDrive : AppCompatActivity() {
                     editor.commit()
                     idCarpetaEvento = fichero.id
                     mostrarMensaje(this@FotografiasDrive, "¡Carpeta creada!")
+                }
+                ocultarCarga(this@FotografiasDrive)
+            } catch (e: UserRecoverableAuthIOException) {
+                ocultarCarga(this@FotografiasDrive)
+                startActivityForResult(e.intent, SOLICITUD_AUTORIZACION)
+            } catch (e: IOException) {
+                mostrarMensaje(this@FotografiasDrive, "Error; ${e.message}")
+                ocultarCarga(this@FotografiasDrive)
+                e.printStackTrace()
+            }
+        })
+        t.start()
+    }
+
+    fun hacerFoto(v: View) {
+        if (nombreCuenta == null) {
+            mostrarMensaje(this, "Debes seleccionar una cuenta de Google Drive")
+        } else {
+            var takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                var ficheroFoto: java.io.File? = null
+                try {
+                    ficheroFoto = crearFicheroImagen()
+                    if (ficheroFoto != null) {
+                        var fichero: Uri = FileProvider.getUriForFile(
+                                this@FotografiasDrive,
+                                BuildConfig.APPLICATION_ID + ".provider",
+                                ficheroFoto)
+                        uriFichero = Uri.parse("content://${ficheroFoto.absolutePath}")
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fichero)
+                        startActivityForResult(takePictureIntent, SOLICITUD_HACER_FOTOGRAFIA)
+                    }
+                } catch (ex: IOException) {
+                    return
+                }
+            }
+        }
+    }
+
+    private fun crearFicheroImagen(): java.io.File {
+        var tiempo: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var nombreFichero: String = "JPEG_${tiempo}_"
+        var dirAlmacenaje: java.io.File = java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera")
+        var ficheroImagen: java.io.File = java.io.File.createTempFile(nombreFichero, ".jpg", dirAlmacenaje)
+        return ficheroImagen
+    }
+
+    fun seleccionarFoto(v: View) {
+        if (nombreCuenta == null) {
+            mostrarMensaje(this, "Debes seleccionar una cuenta de Google Drive")
+        } else {
+            val seleccionFotografiaIntent = Intent()
+            seleccionFotografiaIntent.type = "image/*"
+            seleccionFotografiaIntent.action = Intent.ACTION_PICK
+            startActivityForResult(Intent.createChooser(seleccionFotografiaIntent,
+                    "Seleccionar fotografía"), SOLICITUD_SELECCIONAR_FOTOGRAFIA)
+        }
+    }
+
+    private fun guardarFicheroEnDrive(view: View) {
+        var t: Thread = Thread(Runnable {
+            try {
+                mostrarCarga(this@FotografiasDrive, "Subiendo imagen...")
+                var ficheroJava: java.io.File = java.io.File(uriFichero!!.path)
+                var contenido: FileContent = FileContent("image/jpeg", ficheroJava)
+                val ficheroDrive = File()
+                ficheroDrive.name = ficheroJava.name
+                ficheroDrive.mimeType = "image/jpeg"
+                ficheroDrive.parents = Collections.singletonList(idCarpetaEvento)
+                val ficheroSubido = servicio!!.files().create(ficheroDrive, contenido).setFields("id").execute()
+                if (ficheroSubido.id != null) {
+                    mostrarMensaje(this@FotografiasDrive, "¡Foto subida!")
                 }
                 ocultarCarga(this@FotografiasDrive)
             } catch (e: UserRecoverableAuthIOException) {
