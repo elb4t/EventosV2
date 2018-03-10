@@ -143,6 +143,12 @@ class EventoDetalles : AppCompatActivity() {
                 intent.putExtra("evento", evento)
                 startActivity(intent)
             }
+            R.id.action_fotografiasDriveCompartidas -> {
+                val intent = Intent(baseContext, FotografiasDrive::class.java)
+                intent.putExtra("evento", evento)
+                intent.putExtra("compartida", true)
+                startActivity(intent)
+            }
         }
 
         return super.onOptionsItemSelected(item)

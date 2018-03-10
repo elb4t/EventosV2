@@ -23,11 +23,13 @@ import android.widget.Toast
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.http.FileContent
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
+import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,8 +56,11 @@ class FotografiasDrive : AppCompatActivity() {
     val SOLICITUD_HACER_FOTOGRAFIA = 4
     private var uriFichero: Uri? = null
 
+    private var carpetaCompartida: Boolean = false
     private var idCarpeta: String? = ""
+    private var idCarpetaCompartida: String? = "1wYYcHro4dFEfrehfKwOcscQSNJ7z5iYQ"
     private var idCarpetaEvento: String? = ""
+    private var idCarpetaCompartidaEvento: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +77,13 @@ class FotografiasDrive : AppCompatActivity() {
         noAutoriza = prefs.getBoolean("noAutoriza", false)
         idCarpeta = prefs.getString("idCarpeta", null)
         idCarpetaEvento = prefs.getString("idCarpeta_$evento", null)
+        idCarpetaCompartidaEvento = prefs.getString("idCarpetaCompartida_$evento", null)
+        carpetaCompartida = extras!!.getBoolean("compartida", false)
+
+        if (carpetaCompartida) {
+            idCarpeta = idCarpetaCompartida
+            idCarpetaEvento = idCarpetaCompartidaEvento
+        }
         if (!noAutoriza) {
             if (nombreCuenta == null) {
                 PedirCredenciales()
@@ -214,7 +226,10 @@ class FotografiasDrive : AppCompatActivity() {
                 if (fichero.id != null) {
                     val prefs = getSharedPreferences("Preferencias", Context.MODE_PRIVATE)
                     var editor: SharedPreferences.Editor = prefs.edit()
-                    editor.putString("idCarpeta_" + evento, fichero.id)
+                    if (carpetaCompartida)
+                        editor.putString("idCarpetaCompartida_$evento", fichero.id)
+                    else
+                        editor.putString("idCarpeta_$evento", fichero.id)
                     editor.commit()
                     idCarpetaEvento = fichero.id
                     mostrarMensaje(this@FotografiasDrive, "¡Carpeta creada!")
@@ -295,10 +310,13 @@ class FotografiasDrive : AppCompatActivity() {
             } catch (e: UserRecoverableAuthIOException) {
                 ocultarCarga(this@FotografiasDrive)
                 startActivityForResult(e.intent, SOLICITUD_AUTORIZACION)
-            } catch (e: IOException) {
+            } catch (e: GoogleJsonResponseException) {
                 mostrarMensaje(this@FotografiasDrive, "Error; ${e.message}")
                 ocultarCarga(this@FotografiasDrive)
                 e.printStackTrace()
+                var errJson: JSONObject = JSONObject(e.content)
+                var errors: String = errJson.getString("message")
+
             }
         })
         t.start()

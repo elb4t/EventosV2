@@ -32,4 +32,9 @@
         android:orderInCategory="103"
         android:title="Fotografias Drive"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_fotografiasDriveCompartidas"
+        android:orderInCategory="103"
+        android:title="Fotografias Drive Compartidas"
+        app:showAsAction="never" />
 </menu>
