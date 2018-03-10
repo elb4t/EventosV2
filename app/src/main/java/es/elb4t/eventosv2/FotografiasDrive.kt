@@ -3,9 +3,7 @@ package es.elb4t.eventosv2
 import android.accounts.AccountManager
 import android.app.Activity
 import android.app.ProgressDialog
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -29,6 +27,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
+import com.google.api.services.drive.model.FileList
 import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -65,6 +64,8 @@ class FotografiasDrive : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fotografias_drive)
+        registerReceiver(mHandleMessageReceiver, IntentFilter(DISPLAY_MESSAGE_ACTION))
+        mDisplay = findViewById(R.id.display)
         val extras = intent.extras
         evento = extras!!.getString("evento")
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -92,6 +93,8 @@ class FotografiasDrive : AppCompatActivity() {
                 servicio = obtenerServicioDrive(credencial)
                 if (idCarpetaEvento == null) {
                     crearCarpetaEnDrive(evento!!, idCarpeta)
+                } else {
+                    listarFicheros(this.findViewById(android.R.id.content))
                 }
             }
         }
@@ -302,9 +305,10 @@ class FotografiasDrive : AppCompatActivity() {
                 ficheroDrive.name = ficheroJava.name
                 ficheroDrive.mimeType = "image/jpeg"
                 ficheroDrive.parents = Collections.singletonList(idCarpetaEvento)
-                val ficheroSubido = servicio!!.files().create(ficheroDrive, contenido).setFields("id").execute()
+                val ficheroSubido = servicio!!.files().create(ficheroDrive, contenido).setFields("*").execute()
                 if (ficheroSubido.id != null) {
                     mostrarMensaje(this@FotografiasDrive, "¡Foto subida!")
+                    listarFicheros(view)
                 }
                 ocultarCarga(this@FotografiasDrive)
             } catch (e: UserRecoverableAuthIOException) {
@@ -322,5 +326,61 @@ class FotografiasDrive : AppCompatActivity() {
             }
         })
         t.start()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
+
+    val mHandleMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, intent: Intent) {
+            var nuevoMensaje = intent.extras.getString("mensaje")
+            mDisplay!!.append(nuevoMensaje + "\n")
+        }
+    }
+
+    fun mostrarTexto(contexto: Context, mensaje: String) {
+        var intent = Intent(DISPLAY_MESSAGE_ACTION)
+        intent.putExtra("mensaje", mensaje)
+        contexto.sendBroadcast(intent)
+    }
+
+    private fun listarFicheros(view: View) {
+        if (nombreCuenta == null) {
+            mostrarMensaje(this, "Debes seleccionar una cuenta de Google Drive")
+        } else {
+            var t: Thread = Thread(Runnable {
+                try {
+                    mostrarCarga(this@FotografiasDrive, "Listando archivos...")
+                    var ficheros: FileList = servicio!!.files().list()
+                            .setQ("'$idCarpetaEvento' in parents").setFields("*")
+                            .execute()
+                    for (fichero in ficheros.files) {
+                        mostrarTexto(baseContext, fichero.originalFilename)
+                    }
+                    mostrarMensaje(this@FotografiasDrive, "¡Archivos listados!")
+                    ocultarCarga(this@FotografiasDrive)
+                } catch (e: UserRecoverableAuthIOException) {
+                    ocultarCarga(this@FotografiasDrive)
+                    startActivityForResult(e.intent, SOLICITUD_AUTORIZACION)
+                } catch (e: GoogleJsonResponseException) {
+                    mostrarMensaje(this@FotografiasDrive, "Error; ${e.message}")
+                    ocultarCarga(this@FotografiasDrive)
+                    e.printStackTrace()
+                    var errJson: JSONObject = JSONObject(e.content)
+                    var errors: String = errJson.getString("message")
+                    if (errors.contains(idCarpetaEvento!!.toRegex())) {
+                        crearCarpetaEnDrive(evento!!, idCarpeta)
+                    }
+                }
+            })
+            t.start()
+        }
+    }
+
+    override fun onStop() {
+        unregisterReceiver(mHandleMessageReceiver)
+        super.onStop()
     }
 }
