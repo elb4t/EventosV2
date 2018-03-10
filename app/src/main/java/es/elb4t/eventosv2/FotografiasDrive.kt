@@ -316,7 +316,9 @@ class FotografiasDrive : AppCompatActivity() {
                 e.printStackTrace()
                 var errJson: JSONObject = JSONObject(e.content)
                 var errors: String = errJson.getString("message")
-
+                if (errors.contains(idCarpetaEvento!!.toRegex())) {
+                    crearCarpetaEnDrive(evento!!, idCarpeta)
+                }
             }
         })
         t.start()
