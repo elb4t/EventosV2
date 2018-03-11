@@ -71,6 +71,7 @@ class EventosWeb : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView, url: String) {
                 dialogo!!.dismiss()
+                navegador.loadUrl("javascript:muestraEvento(\"$evento\");")
             }
 
             override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
