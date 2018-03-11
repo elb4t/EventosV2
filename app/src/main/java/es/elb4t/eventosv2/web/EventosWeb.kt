@@ -12,10 +12,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
-import android.webkit.JsResult
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.Toast
 import es.elb4t.eventosv2.R
 import kotlinx.android.synthetic.main.eventos_web.*
@@ -39,6 +36,7 @@ class EventosWeb : AppCompatActivity() {
         navegador = findViewById(R.id.webkit)
         navegador.settings.javaScriptEnabled = true
         navegador.settings.builtInZoomControls = false
+        val miInterfazJava: InterfazComunicacion = InterfazComunicacion(this)
 
         if (comprobarConectividad())
             navegador.loadUrl("https://eventos-3161f.firebaseapp.com/index.html")
@@ -97,6 +95,7 @@ class EventosWeb : AppCompatActivity() {
             }.setNegativeButton("Cancelar") { dialog, id -> dialog.cancel() }
             builder.create().show()
         }
+        navegador.addJavascriptInterface(miInterfazJava, "jsInterfazNativa")
 
         this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         ActivityCompat.requestPermissions(this@EventosWeb, PERMISOS, 1)
@@ -136,5 +135,12 @@ class EventosWeb : AppCompatActivity() {
             return false
         }
         return true
+    }
+
+    inner class InterfazComunicacion internal constructor(internal var mContext: Context) {
+        @JavascriptInterface
+        fun volver() {
+            finish()
+        }
     }
 }
