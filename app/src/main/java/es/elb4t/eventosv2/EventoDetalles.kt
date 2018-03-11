@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -27,6 +28,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import es.elb4t.eventosv2.Comun.Companion.getStorageReference
+import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import es.elb4t.eventosv2.Comun.Companion.storage
 import es.elb4t.eventosv2.web.EventosWeb
@@ -132,25 +134,51 @@ class EventoDetalles : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val vista = findViewById<View>(android.R.id.content) as View
-
+        val bundle = Bundle()
         when (item.itemId) {
-            R.id.action_putData -> subirAFirebaseStorage(SOLICITUD_SUBIR_PUTDATA, null)
-            R.id.action_streamData -> seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_STREAM)
-            R.id.action_putFile -> seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_PUTFILE)
-            R.id.action_getFile -> descargarDeFirebaseStorage(evento!!)
-            R.id.action_deleteFile -> eliminarDeFirebaseStorage(evento!!)
+            R.id.action_putData -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "subir_imagen")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
+                subirAFirebaseStorage(SOLICITUD_SUBIR_PUTDATA, null)
+            }
+            R.id.action_streamData -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "subir_stream")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
+                seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_STREAM)
+            }
+            R.id.action_putFile -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "subir_fichero")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
+                seleccionarFotografiaDispositivo(vista, SOLICITUD_SELECCION_PUTFILE)
+            }
+            R.id.action_getFile -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "descargar_fichero")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
+                descargarDeFirebaseStorage(evento!!)
+            }
+            R.id.action_deleteFile -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "eliminar_fichero")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
+                eliminarDeFirebaseStorage(evento!!)
+            }
             R.id.action_fotografiasDrive -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "fotografias_drive")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
                 val intent = Intent(baseContext, FotografiasDrive::class.java)
                 intent.putExtra("evento", evento)
                 startActivity(intent)
             }
             R.id.action_fotografiasDriveCompartidas -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "fotografias_drive_compartidas")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
                 val intent = Intent(baseContext, FotografiasDrive::class.java)
                 intent.putExtra("evento", evento)
                 intent.putExtra("compartida", true)
                 startActivity(intent)
             }
             R.id.action_acercaDe -> {
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "acerca_de")
+                mFirebaseAnalytics?.logEvent("menus", bundle)
                 var intentWeb = Intent(baseContext, EventosWeb::class.java)
                 intentWeb.putExtra("evento", evento)
                 startActivity(intentWeb)

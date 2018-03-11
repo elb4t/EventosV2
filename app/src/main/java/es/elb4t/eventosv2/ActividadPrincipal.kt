@@ -15,11 +15,13 @@ import android.widget.Toast
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
+import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import es.elb4t.eventosv2.Comun.Companion.storage
 import es.elb4t.eventosv2.Comun.Companion.storageRef
@@ -28,6 +30,8 @@ import es.elb4t.eventosv2.model.Evento
 import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
 import es.elb4t.eventosv2.utils.EventosFirestore.crearEventos
 import kotlinx.android.synthetic.main.activity_actividad_principal.*
+
+
 
 
 class ActividadPrincipal : AppCompatActivity() {
@@ -127,6 +131,9 @@ class ActividadPrincipal : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_temas) {
+            var bundle = Bundle()
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME,"suscripciones")
+            mFirebaseAnalytics!!.logEvent("menus", bundle)
             val intent = Intent(baseContext, Temas::class.java)
             startActivity(intent)
             return true

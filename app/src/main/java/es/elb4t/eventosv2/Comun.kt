@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -32,6 +33,9 @@ class Comun : Application() {
         internal val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
         var appContext: Context? = null
             private set
+
+        var mFirebaseAnalytics: FirebaseAnalytics? = null
+
         fun mostrarDialogo(context: Context, mensaje: String, extras: String) {
             val intent = Intent(context, Dialogo::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -71,6 +75,7 @@ class Comun : Application() {
         super.onCreate()
         Log.e("Comun", "--------FCM Token Refresh: " + FirebaseInstanceId.getInstance().token)
         Comun.appContext = applicationContext
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
     }
 
 
