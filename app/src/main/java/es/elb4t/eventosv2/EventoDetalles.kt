@@ -29,6 +29,7 @@ import com.squareup.picasso.Picasso
 import es.elb4t.eventosv2.Comun.Companion.getStorageReference
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import es.elb4t.eventosv2.Comun.Companion.storage
+import es.elb4t.eventosv2.web.EventosWeb
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -148,6 +149,11 @@ class EventoDetalles : AppCompatActivity() {
                 intent.putExtra("evento", evento)
                 intent.putExtra("compartida", true)
                 startActivity(intent)
+            }
+            R.id.action_acercaDe -> {
+                var intentWeb = Intent(baseContext, EventosWeb::class.java)
+                intentWeb.putExtra("evento", evento)
+                startActivity(intentWeb)
             }
         }
 

@@ -86,6 +86,9 @@
         <activity
             android:name=".FotografiasDrive"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".web.EventosWeb"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
