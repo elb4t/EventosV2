@@ -79,7 +79,7 @@ class Temas : AppCompatActivity() {
                 guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
             }
         }
-        mFirebaseAnalytics?.setUserProperty("evento_detalle", tema)
+        mFirebaseAnalytics?.setUserProperty("suscripcion_tema", tema)
     }
 
 

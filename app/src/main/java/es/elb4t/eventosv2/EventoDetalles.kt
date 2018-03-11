@@ -95,6 +95,7 @@ class EventoDetalles : AppCompatActivity() {
             }
         })
         imagenRef = storage.reference
+        mFirebaseAnalytics?.setUserProperty("evento_detalle", evento)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
