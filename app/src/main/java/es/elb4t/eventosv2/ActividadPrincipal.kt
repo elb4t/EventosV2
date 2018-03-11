@@ -48,7 +48,7 @@ class ActividadPrincipal : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar!!.title = getString(R.string.app_name)
-
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (!comprobarGooglePlayServices()) {
             Toast.makeText(this, "Error Google Play Services: no está instalado o no es válido.", Toast.LENGTH_LONG)
             finish()

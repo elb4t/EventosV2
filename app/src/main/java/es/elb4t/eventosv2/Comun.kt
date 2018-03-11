@@ -75,7 +75,6 @@ class Comun : Application() {
         super.onCreate()
         Log.e("Comun", "--------FCM Token Refresh: " + FirebaseInstanceId.getInstance().token)
         Comun.appContext = applicationContext
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
     }
 
 

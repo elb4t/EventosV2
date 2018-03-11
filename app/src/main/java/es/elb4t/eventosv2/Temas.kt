@@ -8,6 +8,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import es.elb4t.eventosv2.Comun.Companion.eliminarIdRegistro
 import es.elb4t.eventosv2.Comun.Companion.guardarIdRegistro
+import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import kotlinx.android.synthetic.main.temas.*
 
@@ -78,6 +79,7 @@ class Temas : AppCompatActivity() {
                 guardarSuscripcionATemaEnPreferencias(applicationContext, tema, false)
             }
         }
+        mFirebaseAnalytics?.setUserProperty("evento_detalle", tema)
     }
 
 
