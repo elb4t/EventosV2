@@ -16,7 +16,7 @@ import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
+import android.webkit.WebView
 import android.widget.Toast
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
@@ -38,7 +38,7 @@ import java.util.*
  * Created by eloy on 9/3/18.
  */
 class FotografiasDrive : AppCompatActivity() {
-    var mDisplay: TextView? = null
+    lateinit var mDisplay: WebView
     internal var evento: String? = null
     var servicio: Drive? = null
     lateinit var credencial: GoogleAccountCredential
@@ -66,6 +66,10 @@ class FotografiasDrive : AppCompatActivity() {
         setContentView(R.layout.fotografias_drive)
         registerReceiver(mHandleMessageReceiver, IntentFilter(DISPLAY_MESSAGE_ACTION))
         mDisplay = findViewById(R.id.display)
+        mDisplay.settings.javaScriptEnabled = true
+        mDisplay.settings.builtInZoomControls = false
+        mDisplay.loadUrl("file:///android_asset/fotografias.html")
+
         val extras = intent.extras
         evento = extras!!.getString("evento")
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -336,7 +340,6 @@ class FotografiasDrive : AppCompatActivity() {
     val mHandleMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent) {
             var nuevoMensaje = intent.extras.getString("mensaje")
-            mDisplay!!.append(nuevoMensaje + "\n")
         }
     }
 
@@ -353,11 +356,12 @@ class FotografiasDrive : AppCompatActivity() {
             var t: Thread = Thread(Runnable {
                 try {
                     mostrarCarga(this@FotografiasDrive, "Listando archivos...")
+                    vaciarLista(baseContext)
                     var ficheros: FileList = servicio!!.files().list()
                             .setQ("'$idCarpetaEvento' in parents").setFields("*")
                             .execute()
                     for (fichero in ficheros.files) {
-                        mostrarTexto(baseContext, fichero.originalFilename)
+                        addItem(this@FotografiasDrive, fichero.originalFilename,fichero.thumbnailLink)
                     }
                     mostrarMensaje(this@FotografiasDrive, "¡Archivos listados!")
                     ocultarCarga(this@FotografiasDrive)
@@ -383,4 +387,17 @@ class FotografiasDrive : AppCompatActivity() {
         unregisterReceiver(mHandleMessageReceiver)
         super.onStop()
     }
+
+    fun addItem(context: Context, fichero: String, imagen: String) {
+        carga.post(Runnable() {
+            mDisplay.loadUrl("javascript:add(\"$fichero\",\"$imagen\");")
+        })
+    }
+
+    fun vaciarLista(context: Context) {
+        carga.post(Runnable() {
+            mDisplay.loadUrl("javascript:vaciar()")
+        })
+    }
+
 }
