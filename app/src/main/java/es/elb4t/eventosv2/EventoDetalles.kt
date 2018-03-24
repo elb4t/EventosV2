@@ -184,6 +184,12 @@ class EventoDetalles : AppCompatActivity() {
                 intentWeb.putExtra("evento", evento)
                 startActivity(intentWeb)
             }
+            R.id.action_informacion -> {
+                val url = "https://us-central1-eventos-3161f.cloudfunctions.net/mostrarEventosHtml?evento=$evento"
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data = Uri.parse(url)
+                startActivity(i)
+            }
         }
 
         return super.onOptionsItemSelected(item)
