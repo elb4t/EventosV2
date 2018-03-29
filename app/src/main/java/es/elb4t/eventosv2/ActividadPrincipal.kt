@@ -17,6 +17,7 @@ import android.widget.Toast
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.appinvite.AppInvite
 import com.google.android.gms.appinvite.AppInviteInvitation
+import com.google.android.gms.appinvite.AppInviteReferral
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -84,6 +85,18 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                 .build()
 
         ActivityCompat.requestPermissions(this, PERMISOS, 1)
+
+        val autoLaunchDeepLink = true
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink).setResultCallback { result ->
+            if (result.status.isSuccess) {
+                val intent = result.invitationIntent
+                val deepLink = AppInviteReferral.getDeepLink(intent)
+                val invitationId = AppInviteReferral.getInvitationId(intent)
+                val url = Uri.parse(deepLink)
+                val descuento = url.getQueryParameter("descuento")
+                mostrarDialogo(applicationContext, "Tienes un descuento del $descuento% gracias a la invitación: $invitationId", "")
+            }
+        }
     }
 
 
