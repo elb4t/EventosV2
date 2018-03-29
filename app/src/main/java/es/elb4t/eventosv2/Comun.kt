@@ -75,6 +75,8 @@ class Comun : Application() {
         super.onCreate()
         Log.e("Comun", "--------FCM Token Refresh: " + FirebaseInstanceId.getInstance().token)
         Comun.appContext = applicationContext
+        storage = FirebaseStorage.getInstance()
+        storageRef = storage.getReferenceFromUrl("gs://eventos-3161f.appspot.com/")
     }
 
 

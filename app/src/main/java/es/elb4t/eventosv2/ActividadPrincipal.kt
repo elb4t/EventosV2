@@ -19,12 +19,9 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.storage.FirebaseStorage
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
 import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
-import es.elb4t.eventosv2.Comun.Companion.storage
-import es.elb4t.eventosv2.Comun.Companion.storageRef
 import es.elb4t.eventosv2.adapter.AdaptadorEventos
 import es.elb4t.eventosv2.model.Evento
 import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
@@ -75,8 +72,7 @@ class ActividadPrincipal : AppCompatActivity() {
             FirebaseMessaging.getInstance().subscribeToTopic("Todos")
         }
 
-        storage = FirebaseStorage.getInstance()
-        storageRef = storage.getReferenceFromUrl("gs://eventos-3161f.appspot.com/")
+
 
         ActivityCompat.requestPermissions(this, PERMISOS, 1)
     }

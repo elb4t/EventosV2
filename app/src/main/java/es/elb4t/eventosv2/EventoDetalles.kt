@@ -73,7 +73,10 @@ class EventoDetalles : AppCompatActivity() {
 
         val extras = intent.extras
         evento = extras.getString("evento")
-        if (evento == null) evento = ""
+        if (evento == null) {
+            var url: Uri = intent.data
+            evento = url.getQueryParameter("evento")
+        }
 
         registros = FirebaseFirestore.getInstance().collection("eventos")
         registros!!.document(evento!!).get().addOnCompleteListener({
