@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Eventos V2</string>
     <string name="title_activity_enviar_evento">EnviarEvento</string>
+    <string name="invitation_title">
+Envio de una invitación de la app Eventos</string>
+    <string name="invitation_message">
+No te pierdas nunca más un evento interesante.</string>
+    <string name="invitation_deep_link"> https://principal.eventos-3161f.firebaseapp.com</string>
+    <string name="invitation_custom_image"> https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x 92dp.png
+</string>
+    <string name="invitation_cta">Instalar!!</string>
 </resources>

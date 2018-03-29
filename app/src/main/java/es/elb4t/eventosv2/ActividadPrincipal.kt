@@ -1,8 +1,10 @@
 package es.elb4t.eventosv2
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
@@ -13,8 +15,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.android.gms.appinvite.AppInvite
+import com.google.android.gms.appinvite.AppInviteInvitation
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -29,15 +34,16 @@ import es.elb4t.eventosv2.utils.EventosFirestore.crearEventos
 import kotlinx.android.synthetic.main.activity_actividad_principal.*
 
 
+class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
-
-class ActividadPrincipal : AppCompatActivity() {
     private var adapter: AdaptadorEventos? = null
     val PERMISOS = arrayOf(
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.GET_ACCOUNTS,
             android.Manifest.permission.CAMERA
     )
+    private lateinit var mGoogleApiClient: GoogleApiClient
+    private val REQUEST_INVITE = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +78,10 @@ class ActividadPrincipal : AppCompatActivity() {
             FirebaseMessaging.getInstance().subscribeToTopic("Todos")
         }
 
-
+        mGoogleApiClient = GoogleApiClient.Builder(this)
+                .addApi(AppInvite.API)
+                .enableAutoManage(this, this)
+                .build()
 
         ActivityCompat.requestPermissions(this, PERMISOS, 1)
     }
@@ -125,18 +134,21 @@ class ActividadPrincipal : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_temas) {
-            var bundle = Bundle()
-            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME,"suscripciones")
-            mFirebaseAnalytics!!.logEvent("menus", bundle)
-            val intent = Intent(baseContext, Temas::class.java)
-            startActivity(intent)
-            return true
-        } else if (id == R.id.enviarEvento) {
-            val intent = Intent(baseContext, EnviarEvento::class.java)
-            startActivity(intent)
-            return true
+        when (item.itemId) {
+            R.id.action_temas -> {
+                var bundle = Bundle()
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "suscripciones")
+                mFirebaseAnalytics!!.logEvent("menus", bundle)
+                val intent = Intent(baseContext, Temas::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.enviarEvento -> {
+                val intent = Intent(baseContext, EnviarEvento::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.action_invitar -> invitar()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -161,6 +173,32 @@ class ActividadPrincipal : AppCompatActivity() {
                     }
                 }
                 return
+            }
+        }
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
+        Toast.makeText(this, "Error al enviar la invitación", Toast.LENGTH_LONG)
+    }
+
+    fun invitar() {
+        val intent = AppInviteInvitation
+                .IntentBuilder(getString(R.string.invitation_title))
+                .setMessage(getString(R.string.invitation_message))
+                .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
+                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                .setCallToActionText(getString(R.string.invitation_cta))
+                .build()
+        startActivityForResult(intent, REQUEST_INVITE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val ids = AppInviteInvitation.getInvitationIds(resultCode, data)
+            } else {
+                Toast.makeText(this, "Error al enviar la invitación", Toast.LENGTH_LONG)
             }
         }
     }
