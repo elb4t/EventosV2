@@ -25,8 +25,13 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
+import es.elb4t.eventosv2.Comun.Companion.acercaDe
+import es.elb4t.eventosv2.Comun.Companion.colorFondo
 import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
+import es.elb4t.eventosv2.Comun.Companion.mFirebaseRemoteConfig
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
 import es.elb4t.eventosv2.adapter.AdaptadorEventos
 import es.elb4t.eventosv2.model.Evento
@@ -97,6 +102,22 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                 mostrarDialogo(applicationContext, "Tienes un descuento del $descuento% gracias a la invitación: $invitationId", "")
             }
         }
+
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+        val configSettings: FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(BuildConfig.DEBUG).build()
+        mFirebaseRemoteConfig.setConfigSettings(configSettings)
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_default)
+        val cacheExpiration: Long = 30
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnCompleteListener {
+                    mFirebaseRemoteConfig.activateFetched()
+                    getColorFondo()
+                    getAcercaDe()
+                }
+                .addOnFailureListener {
+                    colorFondo = mFirebaseRemoteConfig.getString("color_fondo")
+                    acercaDe = mFirebaseRemoteConfig.getBoolean("acerca_de")
+                }
     }
 
 
@@ -214,5 +235,13 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                 Toast.makeText(this, "Error al enviar la invitación", Toast.LENGTH_LONG)
             }
         }
+    }
+
+    private fun getColorFondo() {
+        colorFondo = mFirebaseRemoteConfig.getString("color_fondo")
+    }
+
+    private fun getAcercaDe() {
+        acercaDe = mFirebaseRemoteConfig.getBoolean("acerca_de")
     }
 }

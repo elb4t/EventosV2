@@ -27,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
+import es.elb4t.eventosv2.Comun.Companion.acercaDe
 import es.elb4t.eventosv2.Comun.Companion.getStorageReference
 import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
@@ -133,6 +134,9 @@ class EventoDetalles : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_detalles, menu)
+        if (!acercaDe) {
+            menu.removeItem(R.id.action_acercaDe)
+        }
         return true
     }
 

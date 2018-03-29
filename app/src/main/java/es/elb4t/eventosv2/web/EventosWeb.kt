@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
 import android.webkit.*
 import android.widget.Toast
+import es.elb4t.eventosv2.Comun.Companion.colorFondo
 import es.elb4t.eventosv2.R
 import kotlinx.android.synthetic.main.eventos_web.*
 import java.net.MalformedURLException
@@ -69,6 +70,7 @@ class EventosWeb : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView, url: String) {
                 dialogo!!.dismiss()
+                navegador.loadUrl("javascript:colorFondo(\"$colorFondo\")")
                 navegador.loadUrl("javascript:muestraEvento(\"$evento\");")
             }
 
