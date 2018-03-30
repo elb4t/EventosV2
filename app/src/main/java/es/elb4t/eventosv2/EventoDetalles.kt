@@ -23,6 +23,9 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.perf.FirebasePerformance
+import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.metrics.Trace
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -55,11 +58,13 @@ class EventoDetalles : AppCompatActivity() {
     val progresoSubida: ProgressDialog? = null
     var subiendoDatos: Boolean? = false
     lateinit var imagenRef: StorageReference
+    lateinit var mTrace: Trace
 
     companion object {
         var uploadTask: UploadTask? = null
     }
 
+    @AddTrace(name = "onCreateTrace", enabled = true)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.evento_detalles)
@@ -100,6 +105,8 @@ class EventoDetalles : AppCompatActivity() {
         })
         imagenRef = storage.reference
         mFirebaseAnalytics?.setUserProperty("evento_detalle", evento)
+        mTrace = FirebasePerformance.getInstance().newTrace("trace_EventoDetalles")
+        mTrace.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -379,5 +386,13 @@ class EventoDetalles : AppCompatActivity() {
                 }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mTrace.start()
+    }
 
+    override fun onStop() {
+        super.onStop()
+        mTrace.stop()
+    }
 }
