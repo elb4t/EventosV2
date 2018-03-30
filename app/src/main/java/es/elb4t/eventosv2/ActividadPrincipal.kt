@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.appinvite.AppInvite
 import com.google.android.gms.appinvite.AppInviteInvitation
@@ -37,6 +38,7 @@ import es.elb4t.eventosv2.adapter.AdaptadorEventos
 import es.elb4t.eventosv2.model.Evento
 import es.elb4t.eventosv2.utils.EventosFirestore.EVENTOS
 import es.elb4t.eventosv2.utils.EventosFirestore.crearEventos
+import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.activity_actividad_principal.*
 
 
@@ -118,6 +120,7 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                     colorFondo = mFirebaseRemoteConfig.getString("color_fondo")
                     acercaDe = mFirebaseRemoteConfig.getBoolean("acerca_de")
                 }
+        Fabric.with(this, Crashlytics())
     }
 
 
@@ -183,6 +186,10 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                 return true
             }
             R.id.action_invitar -> invitar()
+            R.id.action_error -> {
+                Crashlytics.getInstance().crash()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }

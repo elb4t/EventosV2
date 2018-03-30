@@ -16,4 +16,9 @@
         android:id="@+id/enviarEvento"
         android:icon="@android:drawable/ic_menu_send"
         android:title="Enviar evento" />
+    <item
+        android:id="@+id/action_error"
+        android:orderInCategory="101"
+        android:title="Error"
+        app:showAsAction="never" />
 </menu>
