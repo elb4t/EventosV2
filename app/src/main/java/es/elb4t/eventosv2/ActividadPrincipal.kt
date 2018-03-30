@@ -2,12 +2,14 @@ package es.elb4t.eventosv2
 
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
@@ -123,7 +125,9 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                     acercaDe = mFirebaseRemoteConfig.getBoolean("acerca_de")
                     FirebasePerformance.getInstance().isPerformanceCollectionEnabled = mFirebaseRemoteConfig.getBoolean("PerformanceMonitoring")
                 }
-        Fabric.with(this, Crashlytics())
+        val prefs = applicationContext.getSharedPreferences("InformePerformance", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("solicitarInformePerformance", true))
+            solicitarParticipacionInformePerformance()
     }
 
 
@@ -253,5 +257,25 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
 
     private fun getAcercaDe() {
         acercaDe = mFirebaseRemoteConfig.getBoolean("acerca_de")
+    }
+
+    private fun solicitarParticipacionInformePerformance() {
+        val builder = AlertDialog.Builder(this@ActividadPrincipal)
+        builder.setMessage(getString(R.string.mensaje__solicitar_informe))
+        builder.setPositiveButton("Si", DialogInterface.OnClickListener { dialog, which ->
+            Fabric.with(this, Crashlytics())
+            val prefs = applicationContext.getSharedPreferences("InformePerformance", Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            editor.putBoolean("solicitarInformePerformance", false)
+            editor.commit()
+        })
+        builder.setNegativeButton("No", DialogInterface.OnClickListener { dialogInterface, i ->
+            val prefs = applicationContext.getSharedPreferences("InformePerformance", Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            editor.putBoolean("solicitarInformePerformance", false)
+            editor.commit()
+        })
+        val dialog = builder.create()
+        dialog.show()
     }
 }
