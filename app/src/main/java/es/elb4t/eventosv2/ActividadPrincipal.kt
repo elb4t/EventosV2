@@ -26,6 +26,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
@@ -115,10 +116,12 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                     mFirebaseRemoteConfig.activateFetched()
                     getColorFondo()
                     getAcercaDe()
+                    FirebasePerformance.getInstance().isPerformanceCollectionEnabled = mFirebaseRemoteConfig.getBoolean("PerformanceMonitoring")
                 }
                 .addOnFailureListener {
                     colorFondo = mFirebaseRemoteConfig.getString("color_fondo")
                     acercaDe = mFirebaseRemoteConfig.getBoolean("acerca_de")
+                    FirebasePerformance.getInstance().isPerformanceCollectionEnabled = mFirebaseRemoteConfig.getBoolean("PerformanceMonitoring")
                 }
         Fabric.with(this, Crashlytics())
     }
