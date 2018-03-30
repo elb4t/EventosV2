@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'io.fabric'
+
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -52,6 +54,10 @@ dependencies {
     implementation 'com.google.api-client:google-api-client-android:1.17.0-rc'
     implementation 'com.google.apis:google-api-services-drive:v3-rev52-1.22.0'
     implementation 'com.google.android.gms:play-services-auth:11.8.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
+    compile 'com.google.firebase:firebase-core:11.8.0'
 }
 configurations {
     all*.exclude group: 'xpp3', module: 'xpp3'
