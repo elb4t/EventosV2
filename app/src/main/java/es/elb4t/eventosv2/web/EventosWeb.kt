@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.ConnectivityManager
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
@@ -15,10 +16,10 @@ import android.view.WindowManager
 import android.webkit.*
 import android.widget.Toast
 import es.elb4t.eventosv2.Comun.Companion.colorFondo
+import es.elb4t.eventosv2.Comun.Companion.descuento
 import es.elb4t.eventosv2.R
 import kotlinx.android.synthetic.main.eventos_web.*
 import java.net.MalformedURLException
-import java.net.URL
 
 
 class EventosWeb : AppCompatActivity() {
@@ -34,6 +35,11 @@ class EventosWeb : AppCompatActivity() {
         setContentView(R.layout.eventos_web)
         var extras: Bundle = intent.extras
         var evento = extras.getString("evento")
+        if (evento == null) {
+            var url: Uri = intent.data
+            evento = url.getQueryParameter("evento")
+            descuento = url.getQueryParameter("dto") ?: ""
+        }
         navegador = findViewById(R.id.webkit)
         navegador.settings.javaScriptEnabled = true
         navegador.settings.builtInZoomControls = false
@@ -71,7 +77,11 @@ class EventosWeb : AppCompatActivity() {
             override fun onPageFinished(view: WebView, url: String) {
                 dialogo!!.dismiss()
                 navegador.loadUrl("javascript:colorFondo(\"$colorFondo\")")
-                navegador.loadUrl("javascript:muestraEvento(\"$evento\");")
+                if (descuento != "")
+                    navegador.loadUrl("javascript:eventoDescuento(\"$evento\",\"$descuento\");")
+                else
+                    navegador.loadUrl("javascript:muestraEvento(\"$evento\");")
+
             }
 
             override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
@@ -85,11 +95,7 @@ class EventosWeb : AppCompatActivity() {
             builder.setTitle("Descarga")
             builder.setMessage("¿Deseas guardar el archivo?")
             builder.setCancelable(false).setPositiveButton("Aceptar") { dialog, id ->
-                val urlDescarga: URL
                 try {
-                    urlDescarga = URL(url)
-                    var p: String? = url
-                    //DescargaFicheroManager.execute(url,"",this@EventosWeb)
                     DescargarFichero(this@EventosWeb).Descargar(url)
                 } catch (e: MalformedURLException) {
                     e.printStackTrace()

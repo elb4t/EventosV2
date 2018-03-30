@@ -31,8 +31,9 @@ class Comun : Application() {
         var idRegistro = ""
 
         lateinit var mFirebaseRemoteConfig: FirebaseRemoteConfig
-        lateinit var colorFondo:String
+        var colorFondo:String = "Orange"
         var acercaDe: Boolean = false
+        var descuento: String = ""
 
         lateinit var storage: FirebaseStorage
         lateinit var storageRef: StorageReference

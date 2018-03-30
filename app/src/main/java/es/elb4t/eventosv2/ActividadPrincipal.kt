@@ -34,6 +34,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import es.elb4t.eventosv2.Comun.Companion.PLAY_SERVICES_RESOLUTION_REQUEST
 import es.elb4t.eventosv2.Comun.Companion.acercaDe
 import es.elb4t.eventosv2.Comun.Companion.colorFondo
+import es.elb4t.eventosv2.Comun.Companion.descuento
 import es.elb4t.eventosv2.Comun.Companion.mFirebaseAnalytics
 import es.elb4t.eventosv2.Comun.Companion.mFirebaseRemoteConfig
 import es.elb4t.eventosv2.Comun.Companion.mostrarDialogo
@@ -103,7 +104,7 @@ class ActividadPrincipal : AppCompatActivity(), GoogleApiClient.OnConnectionFail
                 val deepLink = AppInviteReferral.getDeepLink(intent)
                 val invitationId = AppInviteReferral.getInvitationId(intent)
                 val url = Uri.parse(deepLink)
-                val descuento = url.getQueryParameter("descuento")
+                descuento = url.getQueryParameter("descuento") ?: ""
                 mostrarDialogo(applicationContext, "Tienes un descuento del $descuento% gracias a la invitación: $invitationId", "")
             }
         }

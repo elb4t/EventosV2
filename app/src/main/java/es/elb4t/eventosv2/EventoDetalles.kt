@@ -107,6 +107,7 @@ class EventoDetalles : AppCompatActivity() {
         mFirebaseAnalytics?.setUserProperty("evento_detalle", evento)
         mTrace = FirebasePerformance.getInstance().newTrace("trace_EventoDetalles")
         mTrace.start()
+        mTrace.incrementCounter("onCreateTrace")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
